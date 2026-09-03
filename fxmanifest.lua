@@ -18,7 +18,7 @@ files {
 provide 'screenshot-basic'
 
 -- use 'nui' if you're having trouble with uploads
-protocol 'http'
+protocol 'nui'
 
 -- bytes per second for nui protocol
 -- change this as you like
