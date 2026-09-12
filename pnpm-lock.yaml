@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  mediabunny@1.40.1:
+    hash: 9707a40ec5909ba26431031ace363316deb7db0d9313d967ec448190389dac8c
+    path: patches/mediabunny@1.40.1.patch
+
 importers:
 
   .:
@@ -113,7 +118,7 @@ importers:
         version: link:../../packages/gameview
       mediabunny:
         specifier: ^1.40.1
-        version: 1.40.1
+        version: 1.40.1(patch_hash=9707a40ec5909ba26431031ace363316deb7db0d9313d967ec448190389dac8c)
     devDependencies:
       typescript:
         specifier: ^5.5.3
@@ -6449,7 +6454,7 @@ snapshots:
 
   media-typer@0.3.0: {}
 
-  mediabunny@1.40.1:
+  mediabunny@1.40.1(patch_hash=9707a40ec5909ba26431031ace363316deb7db0d9313d967ec448190389dac8c):
     dependencies:
       '@types/dom-mediacapture-transform': 0.1.11
       '@types/dom-webcodecs': 0.1.13

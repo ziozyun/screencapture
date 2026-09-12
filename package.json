@@ -26,6 +26,11 @@
   "keywords": [],
   "author": "itschip",
   "license": "MIT",
+  "pnpm": {
+    "patchedDependencies": {
+      "mediabunny@1.40.1": "patches/mediabunny@1.40.1.patch"
+    }
+  },
   "devDependencies": {
     "prettier": "^3.3.3",
     "turbo": "^2.1.2",

@@ -1,0 +1,80 @@
+name: Nightly prerelease
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nightly-release
+  cancel-in-progress: false
+
+jobs:
+  create-nightly-release:
+    name: Build and update nightly prerelease
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install archive tools
+        run: sudo apt install zip
+
+      - name: Checkout source code
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6.0.10
+        with:
+          version: 9.11.0
+
+      - name: Setup node
+        uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 24.19.0
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Run build
+        run: pnpm build
+        env:
+          CI: false
+
+      - name: Set nightly manifest version
+        run: |
+          BASE_VERSION="$(node -e "const fs = require('fs'); const match = fs.readFileSync('fxmanifest.lua', 'utf8').match(/^version\s+'([^']+)'/m); if (!match) process.exit(1); process.stdout.write(match[1]);")"
+          TGT_RELEASE_VERSION="v${BASE_VERSION}-nightly.${GITHUB_RUN_NUMBER}" node .github/actions/bump-manifest-version.js
+
+      - name: Bundle files
+        run: |
+          mkdir -p ./temp/screencapture
+          mkdir -p ./temp/screencapture/game
+          mkdir -p ./temp/screencapture/game/nui
+          cp ./{README.md,LICENSE,fxmanifest.lua} ./temp/screencapture
+          cp -r ./game/dist ./temp/screencapture/game/dist
+          cp -r ./game/nui/dist ./temp/screencapture/game/nui/dist
+          cd ./temp && zip -r ../screencapture.zip ./screencapture
+
+      - name: Update nightly prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view nightly >/dev/null 2>&1; then
+            gh release delete nightly --cleanup-tag --yes
+          fi
+
+          git tag --force nightly "$GITHUB_SHA"
+          git push --force origin refs/tags/nightly
+
+          gh release create nightly screencapture.zip \
+            --title "Nightly (${GITHUB_SHA::7})" \
+            --notes "Automated prerelease build from commit ${GITHUB_SHA} on ${GITHUB_REF_NAME}." \
+            --prerelease \
+            --latest=false \
+            --verify-tag
