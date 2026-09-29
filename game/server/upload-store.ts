@@ -59,6 +59,10 @@ export class UploadStore {
     return data;
   }
 
+  removeUpload(uploadToken: string): void {
+    this.#uploadMap.delete(uploadToken);
+  }
+
   getStream(token: string): StreamUploadData {
     const captureId = this.#tokenToCaptureId.get(token) ?? token;
     const data = this.#streamUploadMap.get(captureId);

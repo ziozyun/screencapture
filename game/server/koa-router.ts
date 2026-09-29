@@ -66,6 +66,8 @@ export async function createServer(uploadStore: UploadStore) {
 
     try {
       const uploadData = uploadStore.getUpload(token);
+      uploadStore.removeUpload(token);
+
       await processUpload(uploadData, file.buffer);
 
       ctx.status = 200;

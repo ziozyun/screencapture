@@ -43,6 +43,8 @@ export function registerImageHandlers() {
   onNet('screencapture:capture-screen', async (token: string, base64Data: string) => {
     try {
       const uploadData = uploadStore.getUpload(token);
+      uploadStore.removeUpload(token);
+
       await processUpload(uploadData, base64Data);
     } catch (err) {
       console.error('[screencapture] capture-screen error:', err);
@@ -52,6 +54,8 @@ export function registerImageHandlers() {
   onNet('screencapture:PerformUploadProxy', async (token: string, base64Data: string) => {
     const uploadData = uploadStore.getUpload(token);
     if (!uploadData) return;
+
+    uploadStore.removeUpload(token);
 
     const { callback, url, remoteConfig, dataType, screenshotBasicCompatibility, playerSource, correlationId } = uploadData;
 
